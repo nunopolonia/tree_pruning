@@ -4,6 +4,10 @@ defmodule TreePruning.Endpoint do
   plug Plug.RequestId
   plug Plug.Logger
 
+  if code_reloading? do
+    plug Phoenix.CodeReloader
+  end
+
   plug Plug.Parsers,
     parsers: [:urlencoded, :multipart, :json],
     pass: ["*/*"],
