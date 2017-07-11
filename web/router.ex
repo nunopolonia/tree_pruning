@@ -5,7 +5,9 @@ defmodule TreePruning.Router do
     plug :accepts, ["json"]
   end
 
-  scope "/api", TreePruning do
+  scope "/", TreePruning do
     pipe_through :api
+
+    get "/tree/:name", TreeController, :prune
   end
 end

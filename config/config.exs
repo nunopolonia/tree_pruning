@@ -7,7 +7,8 @@ use Mix.Config
 
 # General application configuration
 config :tree_pruning,
-  ecto_repos: [TreePruning.Repo]
+  ecto_repos: [TreePruning.Repo],
+  upstream: System.get_env("UPSTREAM_URL")
 
 # Configures the endpoint
 config :tree_pruning, TreePruning.Endpoint,

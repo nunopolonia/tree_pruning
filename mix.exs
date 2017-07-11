@@ -20,6 +20,7 @@ defmodule TreePruning.Mixfile do
     [mod: {TreePruning, []},
      applications: [
       :cowboy,
+      :httpoison,
       :logger,
       :phoenix,
       :phoenix_ecto,
@@ -37,6 +38,7 @@ defmodule TreePruning.Mixfile do
   defp deps do
     [
       {:cowboy, "~> 1.0"},
+      {:httpoison, "~> 0.12"},
       {:phoenix, "~> 1.2.4"},
       {:phoenix_ecto, "~> 3.0"},
       {:postgrex, ">= 0.0.0"},

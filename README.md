@@ -12,7 +12,8 @@ To start your Phoenix app:
 
 Use your preferred method to add the following variables to your environment.
 
-| Variable           | Description             | Environments
-| ------------------ | ----------------------- | ------------
-| DB_URL             | Postgresql database url | All
-| SECRET_KEY_BASE    | Secret key base         | All
+| Variable           | Description                      | Environments
+| ------------------ | -------------------------------- | ------------
+| DB_URL             | Postgresql database url          | All
+| SECRET_KEY_BASE    | Secret key base                  | All
+| UPSTREAM_URL       | URL of the upstream tree service | All
