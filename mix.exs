@@ -2,15 +2,24 @@ defmodule TreePruning.Mixfile do
   use Mix.Project
 
   def project do
-    [app: :tree_pruning,
-     version: "0.0.1",
-     elixir: "~> 1.2",
-     elixirc_paths: elixirc_paths(Mix.env),
-     compilers: [:phoenix] ++ Mix.compilers,
-     build_embedded: Mix.env == :prod,
-     start_permanent: Mix.env == :prod,
-     aliases: aliases(),
-     deps: deps()]
+    [
+      app: :tree_pruning,
+      version: "0.0.1",
+      elixir: "~> 1.2",
+      elixirc_paths: elixirc_paths(Mix.env),
+      compilers: [:phoenix] ++ Mix.compilers,
+      build_embedded: Mix.env == :prod,
+      start_permanent: Mix.env == :prod,
+      aliases: aliases(),
+      deps: deps(),
+      test_coverage: [tool: ExCoveralls],
+      preferred_cli_env: [
+        "coveralls": :test,
+        "coveralls.detail": :test,
+        "coveralls.post": :test,
+        "coveralls.html": :test
+      ]
+    ]
   end
 
   # Configuration for the OTP application.
@@ -38,6 +47,8 @@ defmodule TreePruning.Mixfile do
   defp deps do
     [
       {:cowboy, "~> 1.0"},
+      {:credo, "~> 0.8", only: [:dev, :test], runtime: false},
+      {:excoveralls, "~> 0.7", only: :test},
       {:httpoison, "~> 0.12"},
       {:phoenix, "~> 1.2.4"},
       {:phoenix_ecto, "~> 3.0"},
@@ -64,7 +75,8 @@ defmodule TreePruning.Mixfile do
       ],
       "test": [
         "ecto.create --quiet",
-        "ecto.migrate", "test"
+        "ecto.migrate",
+        "coveralls",
       ],
       "server": [
         "phoenix.server"

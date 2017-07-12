@@ -1,0 +1,15 @@
+{
+  "skip_files": [
+    "lib/tree_pruning.ex",
+    "lib/tree_pruning/endpoint.ex",
+    "lib/tree_pruning/repo.ex",
+    "test/support/conn_case.ex",
+    "test/support/model_case.ex",
+    "web/web.ex"
+  ],
+
+  "coverage_options": {
+    "treat_no_relevant_lines_as_covered": true,
+    "output_dir": "cover/"
+  }
+}

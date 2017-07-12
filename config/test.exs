@@ -8,3 +8,9 @@ config :tree_pruning, TreePruning.Endpoint,
 
 # Print only warnings and errors during test
 config :logger, level: :warn
+
+# Configure your database
+config :tree_pruning, TreePruning.Repo,
+  pool: Ecto.Adapters.SQL.Sandbox,
+  adapter: Ecto.Adapters.Postgres,
+  url: "#{System.get_env("DB_URL")}-test"
