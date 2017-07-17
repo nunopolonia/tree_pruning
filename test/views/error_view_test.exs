@@ -6,7 +6,7 @@ defmodule TreePruning.ErrorViewTest do
 
   test "renders 404.json" do
     assert render(TreePruning.ErrorView, "404.json", []) ==
-           %{errors: %{detail: "Page not found"}}
+           %{errors: %{detail: "Tree not found"}}
   end
 
   test "render 500.json" do

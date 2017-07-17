@@ -9,6 +9,9 @@ config :tree_pruning, TreePruning.Endpoint,
 # Print only warnings and errors during test
 config :logger, level: :warn
 
+config :tree_pruning,
+  http_lib: FakeHTTPoison
+
 # Configure your database
 config :tree_pruning, TreePruning.Repo,
   pool: Ecto.Adapters.SQL.Sandbox,
