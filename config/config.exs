@@ -9,7 +9,8 @@ use Mix.Config
 config :tree_pruning,
   ecto_repos: [TreePruning.Repo],
   http_lib: HTTPoison,
-  upstream: System.get_env("UPSTREAM_URL")
+  upstream: System.get_env("UPSTREAM_URL"),
+  upstream_tries: 3
 
 # Configures the endpoint
 config :tree_pruning, TreePruning.Endpoint,
