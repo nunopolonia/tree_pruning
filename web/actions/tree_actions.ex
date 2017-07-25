@@ -13,58 +13,62 @@ defmodule TreePruning.TreeActions do
     This "back propagation" happens at every level of the tree until
     every branch is traversed and pruned.
   """
-
   def prune(themes, ids) do
-    pruned_themes =
-      Enum.map(themes, fn(theme) ->
-        traverse_theme(theme, convert_ids_to_ints(ids))
-      end)
-
-    Enum.reject(pruned_themes, &is_nil/1)
+    prune_nodes(themes, convert_ids_to_ints(ids), [])
   end
 
-  def traverse_theme(theme = %{"sub_themes" => sub_themes}, ids) do
-    pruned_subthemes =
-      Enum.map(sub_themes, fn(subtheme) ->
-        traverse_subtheme(subtheme, ids)
-      end)
+  defp prune_nodes([], _ids, result), do: result
+  defp prune_nodes([node | tail], ids, result) do
+    updated_node = 
+      case node do
+        %{"sub_themes" => _} -> traverse_theme(node, ids)
+        %{"categories" => _} -> traverse_subtheme(node, ids)
+        %{"indicators" => _} -> traverse_category(node, ids)
+      end
+    
+    updated_result =
+      case is_nil(updated_node) do
+        true -> result
+        false -> result ++ [updated_node]
+      end
 
-    compact_subthemes = Enum.reject(pruned_subthemes, &is_nil/1)
+    prune_nodes(tail, ids, updated_result)
+  end
 
-    unless Enum.empty?(compact_subthemes) do
-      Map.put(theme, "sub_themes", compact_subthemes)
+  defp traverse_theme(theme = %{"sub_themes" => sub_themes}, ids) do
+    pruned_subthemes = prune_nodes(sub_themes, ids, [])
+
+    unless Enum.empty?(pruned_subthemes) do
+      Map.put(theme, "sub_themes", pruned_subthemes)
     end
   end
 
-  def traverse_subtheme(subtheme = %{"categories" => categories}, ids) do
-    pruned_categories =
-      Enum.map(categories, fn(category) ->
-        traverse_category(category, ids)
-      end)
+  defp traverse_subtheme(subtheme = %{"categories" => categories}, ids) do
+    pruned_categories = prune_nodes(categories, ids, [])
 
-    compact_categories = Enum.reject(pruned_categories, &is_nil/1)
-
-    unless Enum.empty?(compact_categories) do
-      Map.put(subtheme, "categories", compact_categories)
+    unless Enum.empty?(pruned_categories) do
+      Map.put(subtheme, "categories", pruned_categories)
     end
   end
 
-  def traverse_category(category = %{"indicators" => indicators}, ids) do
-    valid_indicators = prune_indicators(indicators, ids)
+  defp traverse_category(category = %{"indicators" => indicators}, ids) do
+    valid_indicators = prune_leafs(indicators, ids, [])
 
     unless Enum.empty?(valid_indicators) do
       Map.put(category, "indicators", valid_indicators)
     end
   end
 
-  defp prune_indicators(list, ids) do
-    Enum.reduce(list, [], fn(indicator, acc) ->
+  defp prune_leafs([], _ids, result), do: result
+  defp prune_leafs([indicator | tail], ids, result) do
+    updated_result =
       case Enum.member?(ids, indicator["id"]) do
-        true -> acc ++ [indicator]
-        false -> acc
+        true -> result ++ [indicator]
+        false -> result
       end
-    end)
-  end
+
+    prune_leafs(tail, ids, updated_result)
+  end 
 
   defp convert_ids_to_ints(ids) do
     Enum.map(ids, fn(id) -> String.to_integer(id) end)
