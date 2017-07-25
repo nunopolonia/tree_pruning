@@ -6,6 +6,11 @@ defmodule TreePruning.TreeController do
   @http_lib Application.get_env(:tree_pruning, :http_lib)
   @upstream Application.get_env(:tree_pruning, :upstream)
 
+  def prune(conn, %{"name" => _}) do
+    conn
+    |> put_status(200)
+    |> render("tree.json", tree: [])
+  end
   def prune(conn, %{"name" => name, "indicator_ids" => ids}) do
     case @http_lib.get(@upstream <> name) do
       {:ok, %HTTPoison.Response{status_code: 200, body: body}} ->
