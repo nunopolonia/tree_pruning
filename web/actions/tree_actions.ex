@@ -19,12 +19,7 @@ defmodule TreePruning.TreeActions do
 
   defp prune_nodes([], _ids, result), do: result
   defp prune_nodes([node | tail], ids, result) do
-    updated_node = 
-      case node do
-        %{"sub_themes" => _} -> traverse_theme(node, ids)
-        %{"categories" => _} -> traverse_subtheme(node, ids)
-        %{"indicators" => _} -> traverse_category(node, ids)
-      end
+    updated_node = traverse_node(node, ids)
     
     updated_result =
       case is_nil(updated_node) do
@@ -35,39 +30,30 @@ defmodule TreePruning.TreeActions do
     prune_nodes(tail, ids, updated_result)
   end
 
-  defp traverse_theme(theme = %{"sub_themes" => sub_themes}, ids) do
-    pruned_subthemes = prune_nodes(sub_themes, ids, [])
+  defp traverse_node(node, ids) do
+    {key, func} =
+      case node do
+        %{"sub_themes" => _} -> {"sub_themes", &prune_nodes/3}
+        %{"categories" => _} -> {"categories", &prune_nodes/3}
+        %{"indicators" => _} -> {"indicators", &prune_leaves/3}
+      end
 
-    unless Enum.empty?(pruned_subthemes) do
-      Map.put(theme, "sub_themes", pruned_subthemes)
+    pruned_nodes = func.(node[key], ids, [])
+
+    unless Enum.empty?(pruned_nodes) do
+      Map.put(node, key, pruned_nodes)
     end
   end
 
-  defp traverse_subtheme(subtheme = %{"categories" => categories}, ids) do
-    pruned_categories = prune_nodes(categories, ids, [])
-
-    unless Enum.empty?(pruned_categories) do
-      Map.put(subtheme, "categories", pruned_categories)
-    end
-  end
-
-  defp traverse_category(category = %{"indicators" => indicators}, ids) do
-    valid_indicators = prune_leafs(indicators, ids, [])
-
-    unless Enum.empty?(valid_indicators) do
-      Map.put(category, "indicators", valid_indicators)
-    end
-  end
-
-  defp prune_leafs([], _ids, result), do: result
-  defp prune_leafs([indicator | tail], ids, result) do
+  defp prune_leaves([], _ids, result), do: result
+  defp prune_leaves([indicator | tail], ids, result) do
     updated_result =
       case Enum.member?(ids, indicator["id"]) do
         true -> result ++ [indicator]
         false -> result
       end
 
-    prune_leafs(tail, ids, updated_result)
+    prune_leaves(tail, ids, updated_result)
   end 
 
   defp convert_ids_to_ints(ids) do
